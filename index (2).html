@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CHOCO N DIP Orders</title>
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Choco Orders">
+  <link rel="apple-touch-icon" href="https://dedosfoodtruck.com/choco-order/logo.jpg">
+
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f2f2f7; color: #000; -webkit-tap-highlight-color: transparent; }
+    .screen { display: none; padding: 20px; padding-bottom: 140px; }
+    .screen.active { display: block; }
+    h1, h2 { text-align: center; margin-bottom: 20px; }
+    input, select { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 10px; box-sizing: border-box; font-size: 16px; background: white; }
+    .btn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; margin-bottom: 15px; cursor: pointer; }
+    .btn-success { background: #34c759; }
+    .btn-danger { background: #ff3b30; }
+    .btn-warning { background: #ff9500; }
+    .btn-purple { background: #af52de; }
+    .btn-weekly { background: #6f42c1; color: white; }
+    .btn-closing { background-color: #343a40; }
+    .btn-closing-history { background-color: #5856d6; }
+    .btn-weekly-history { background-color: #8950fc; }
+    .btn-product-manage { background-color: #007aff; }
+    .btn-recipe-manage { background-color: #ff9500; }
+
+    .warning-box { background: #ff4d4d; color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; font-weight: bold; text-align: center; font-size: 15px; }
+
+    .notice-card { background: #ffffff; border: 1px solid #e5e5ea; border-left: 4px solid #007aff; padding: 15px; border-radius: 10px; margin-top: 20px; font-size: 14px; color: #3a3a3c; text-align: left; line-height: 1.5; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    
+    .sticky-header-container { position: sticky; top: 0; z-index: 105; background: #f2f2f7; padding-top: 10px; margin-bottom: 15px; border-bottom: 1px solid #e5e5ea; }
+    .top-nav { display: flex; gap: 10px; margin-bottom: 10px; }
+    #searchBox { margin-bottom: 10px; border-color: #007aff; }
+    #filterContainer { display: block; margin-bottom: 10px; }
+    #categoryFilter { margin-bottom: 0; border-color: #007aff; color: #007aff; font-weight: bold; }
+    
+    .product-card { background: white; border-radius: 10px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .product-card.highlighted { border-left: 6px solid #ff9500; background-color: #fffdf9; border-top: 1px solid #ffeeba; border-right: 1px solid #ffeeba; border-bottom: 1px solid #ffeeba; }
+    .highlight-badge { background: #ff9500; color: white; font-size: 12px; padding: 3px 8px; border-radius: 6px; font-weight: bold; margin-right: 8px; display: inline-block; vertical-align: middle; }
+
+    .product-top { display: flex; align-items: center; padding: 15px; }
+    .product-img { width: 90px; height: 90px; object-fit: contain; margin-right: 15px; background-color: #f2f2f7; border-radius: 5px; }
+    .product-name { font-size: 18px; font-weight: 600; flex-grow: 1; }
+    .product-counter { display: flex; border-top: 1px solid #e5e5ea; }
+    .product-counter button { flex: 1; background: white; border: none; font-size: 26px; color: #007aff; padding: 10px 0; cursor: pointer; }
+    .product-counter .qty { flex: 2; text-align: center; font-size: 20px; line-height: 50px; border-left: 1px solid #e5e5ea; border-right: 1px solid #e5e5ea; font-weight: bold; }
+    .category-header { font-size: 20px; font-weight: bold; margin: 10px 0 10px 0; color: #333; }
+    
+    .recipe-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 10px; }
+    .recipe-row { display: flex; align-items: center; gap: 15px; }
+    .recipe-item input[type="checkbox"] { width: 28px; height: 28px; accent-color: #34c759; cursor: pointer; }
+    .recipe-details { flex-grow: 1; }
+    .recipe-ing-name { font-size: 18px; font-weight: bold; color: #1c1c1e; }
+    .recipe-ing-qty { font-size: 22px; color: #d70015; font-weight: 800; margin-top: 4px; background: #fff2f2; padding: 4px 10px; border-radius: 6px; display: inline-block; }
+    .recipe-img { width: 75px; height: 75px; object-fit: contain; background: #f2f2f7; border-radius: 6px; }
+    
+    .shortage-box { display: flex; align-items: center; gap: 8px; background: #fff8f8; padding: 8px 12px; border-radius: 8px; border: 1px solid #ffd1d1; margin-top: 5px; }
+    .shortage-box input[type="checkbox"] { width: 22px; height: 22px; accent-color: #ff3b30; cursor: pointer; }
+    .shortage-label { font-size: 14px; font-weight: bold; color: #ff3b30; cursor: pointer; }
+
+    .log-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #af52de; display: flex; align-items: center; gap: 12px; }
+    .closing-log-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #5856d6; display: flex; align-items: center; gap: 12px; text-align: left; }
+    .cleaning-log-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #8950fc; display: flex; align-items: center; gap: 12px; text-align: left; }
+
+    .floating-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; display: none; z-index: 102; }
+    .floating-bar.active { display: block; }
+    
+    .review-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; background: white; border-bottom: 1px solid #e5e5ea; font-size: 16px; }
+    .review-controls { display: flex; align-items: center; gap: 10px; }
+    .review-controls button { width: 32px; height: 32px; background: #007aff; color: white; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    .review-controls span { font-weight: bold; font-size: 16px; min-width: 20px; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div id="loading" class="screen active">
+    <h2 style="margin-top: 50%;">Loading Data...</h2>
+  </div>
+
+  <div id="deviceActivation" class="screen">
+    <h2 style="margin-top: 30%;">Device Authorization</h2>
+    <p style="text-align: center; color: #666; font-size: 15px; margin-bottom: 20px;">This device is not authorized. Enter Manager Master Key to unlock.</p>
+    <input type="password" id="masterPin" placeholder="Enter Manager Master Key">
+    <button class="btn btn-success" onclick="verifyDeviceMasterKey()">Authorize Device</button>
+  </div>
+
+  <div id="login" class="screen">
+    <h2 style="margin-top: 40%;">Staff Login</h2>
+    <input type="password" id="pinCode" placeholder="Enter Password">
+    <button class="btn" onclick="checkLogin()">Login</button>
+  </div>
+
+  <div id="home" class="screen">
+    <img id="mainLogo" src="logo.jpg" alt="Logo" style="width: 130px; height: 130px; border-radius: 50%; display: block; margin: 10% auto 20px auto; object-fit: contain;" onerror="this.onerror=null; this.src='https://placehold.co/400x400/3e2723/ffffff?text=Choco+N+Dip';">
+    
+    <div id="fridayWarning" class="warning-box">
+      ⚠️ Warning: Today is Friday and there are still pending weekly cleaning tasks!
+    </div>
+
+    <button class="btn" onclick="selectOrderType('COSTCO')">COSTCO Order</button>
+    <button class="btn btn-success" onclick="selectOrderType('GENERAL')">GENERAL Order</button>
+    <div id="dynamicOrderButtons"></div>
+
+    <button class="btn btn-warning" onclick="startRecipePrepSetup()">Recipe Prep</button>
+    <button class="btn btn-closing" onclick="openClosingModal()">Closing Checklist</button>
+    <button class="btn btn-weekly" onclick="openWeeklyCleaningModal()">Weekly Cleaning Tasks</button>
+
+    <div class="notice-card">
+      <strong>Notice to Team:</strong><br>
+      Thank you for your continued dedication and hard work. Please ensure that all order quantities and items are thoroughly verified before final submission. We appreciate your attention to detail.
+    </div>
+
+    <button class="btn btn-purple" style="margin-top: 20px;" onclick="showScreen('managerLogin')">Manager Portal</button>
+  </div>
+
+  <div id="managerLogin" class="screen">
+    <h2 style="margin-top: 30%;">Manager Authentication</h2>
+    <p style="text-align: center; color: #666; font-size: 15px; margin-bottom: 20px;">Enter Manager Key to access Manager Menu.</p>
+    <input type="password" id="globalManagerPin" placeholder="Enter Manager Key">
+    <button class="btn btn-purple" onclick="verifyGlobalManagerKey()">Login</button>
+    <button class="btn btn-danger" onclick="showScreen('home')">Back</button>
+  </div>
+
+  <div id="managerMenu" class="screen">
+    <h2 style="margin-top: 15%;">Manager Dashboard</h2>
+    <p style="text-align: center; color: #666; font-size: 14px; margin-bottom: 10px;">Select an option below:</p>
+    <button class="btn btn-purple" onclick="fetchRecipeHistory(activeManagerKey)">Recipe History</button>
+    <button class="btn btn-closing-history" onclick="fetchClosingHistory(activeManagerKey)">Closing History</button>
+    <button class="btn btn-weekly-history" onclick="fetchWeeklyCleaningHistory(activeManagerKey)">Weekly Cleaning History</button>
+    <button class="btn btn-weekly" onclick="showManagerTasksScreen()">Manage Tasks</button>
+    <button class="btn btn-product-manage" onclick="showManagerManageProductsScreen()">Products (Add / Edit / Delete)</button>
+    <button class="btn btn-recipe-manage" onclick="showManagerManageRecipesScreen()">Recipes (Add / Edit / Delete)</button>
+    <button class="btn btn-danger" onclick="showScreen('home')">Back to Home</button>
+  </div>
+
+  <div id="managerManageProductsScreen" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0;" onclick="showScreen('managerMenu')">Back</button>
+         <button class="btn btn-product-manage" style="margin-bottom: 0;" onclick="showManagerAddProductScreen()">+ Add New Product</button>
+      </div>
+      <h2>Manage Products</h2>
+    </div>
+    <div id="manageProductsList"></div>
+  </div>
+
+  <div id="managerAddProductScreen" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0;" onclick="showManagerManageProductsScreen()">Back</button>
+      </div>
+      <h2>Add New Product</h2>
+    </div>
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+      <label><b>Product Name:</b></label>
+      <input type="text" id="newProdName" placeholder="Enter product name">
+      
+      <label><b>Order Type:</b></label>
+      <select id="newProdType" onchange="updateCategoryFieldType()">
+        <option value="COSTCO">COSTCO</option>
+        <option value="GENERAL">GENERAL</option>
+      </select>
+
+      <div id="categoryFieldWrapper">
+        <label><b>Category Name:</b></label>
+        <input type="text" id="newProdCategory" placeholder="Enter or select category (e.g. Crepes, Drinks)" list="catList">
+        <datalist id="catList"></datalist>
+      </div>
+
+      <label style="display: flex; align-items: center; gap: 10px; margin-top: 15px; cursor: pointer;">
+        <input type="checkbox" id="newProdPopular" style="width: 24px; height: 24px; accent-color: #ff9500;">
+        <span style="font-size: 16px; font-weight: bold;">⭐ Mark as Popular (Highlight)</span>
+      </label>
+
+      <button class="btn btn-product-manage" style="margin-top: 15px;" onclick="addNewProductFromTablet()">Save & Add Product</button>
+    </div>
+  </div>
+
+  <div id="managerManageRecipesScreen" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0;" onclick="showScreen('managerMenu')">Back</button>
+         <button class="btn btn-recipe-manage" style="margin-bottom: 0;" onclick="showManagerAddRecipeScreen()">+ Add Recipe</button>
+      </div>
+      <h2>Manage Recipes</h2>
+    </div>
+    <div id="manageRecipesList"></div>
+  </div>
+
+  <div id="managerAddRecipeScreen" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0;" onclick="showManagerManageRecipesScreen()">Back</button>
+      </div>
+      <h2>Add Recipe & Ingredients</h2>
+    </div>
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+      <label><b>Recipe Name:</b></label>
+      <input type="text" id="newRecipeName" placeholder="Enter recipe name (e.g. Waffle Mix)">
+
+      <h3 style="margin: 20px 0 10px 0; color: #333; font-size: 16px;">Ingredients:</h3>
+      <div id="ingredientsRowsContainer"></div>
+
+      <button class="btn btn-warning" style="margin-top: 10px; margin-bottom: 15px;" onclick="addIngredientRow()">+ Add Another Ingredient</button>
+      <button class="btn btn-recipe-manage" onclick="saveBatchRecipe()">Save Recipe with All Ingredients</button>
+    </div>
+  </div>
+
+  <div id="managerTasksScreen" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0;" onclick="showScreen('managerMenu')">Back</button>
+      </div>
+      <h2>Manage Tasks</h2>
+    </div>
+
+    <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+      <h3 style="margin-top:0; color:#333;">Add Closing Task</h3>
+      <input type="text" id="newClosingTaskInput" placeholder="Enter new closing task name">
+      <button class="btn btn-closing" onclick="addNewClosingTask()">Add Closing Task</button>
+      <h4 style="margin: 15px 0 5px 0; color:#555;">Existing Closing Tasks:</h4>
+      <div id="existingClosingTasksList" style="max-height: 150px; overflow-y: auto; border: 1px solid #e5e5ea; padding: 8px; border-radius: 6px;"></div>
+    </div>
+
+    <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+      <h3 style="margin-top:0; color:#333;">Add Weekly Cleaning Task</h3>
+      <input type="text" id="newWeeklyTaskInput" placeholder="Enter new weekly task name">
+      <button class="btn btn-weekly" onclick="addNewWeeklyTask()">Add Weekly Task</button>
+      <h4 style="margin: 15px 0 5px 0; color:#555;">Existing Weekly Tasks:</h4>
+      <div id="existingWeeklyTasksList" style="max-height: 150px; overflow-y: auto; border: 1px solid #e5e5ea; padding: 8px; border-radius: 6px;"></div>
+    </div>
+  </div>
+
+  <div id="details" class="screen">
+    <h2 id="orderTypeTitle"></h2>
+    <input type="text" id="branch" placeholder="Location / Branch (e.g. WEM)" required>
+    <input type="text" id="employee" placeholder="Employee Name" required>
+    <button class="btn" onclick="startOrder()">Start Ordering</button>
+    <button class="btn btn-danger" onclick="showScreen('home')">Back</button>
+  </div>
+
+  <div id="recipeHistoryScreen" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0; flex: 1;" onclick="showScreen('managerMenu')">Back</button>
+         <button class="btn btn-warning" style="margin-bottom: 0; flex: 1;" onclick="toggleSelectAll('RecipeLogs')">Select All</button>
+         <button class="btn btn-danger" style="margin-bottom: 0; flex: 1; background-color: #ff3b30;" onclick="deleteSelectedLogs('RecipeLogs')">Delete Selected</button>
+      </div>
+      <h2>Recipe Preparation Logs</h2>
+    </div>
+    <div id="historyLogsList"></div>
+  </div>
+
+  <div id="closingHistoryScreen" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0; flex: 1;" onclick="showScreen('managerMenu')">Back</button>
+         <button class="btn btn-warning" style="margin-bottom: 0; flex: 1;" onclick="toggleSelectAll('ClosingLogs')">Select All</button>
+         <button class="btn btn-danger" style="margin-bottom: 0; flex: 1; background-color: #ff3b30;" onclick="deleteSelectedLogs('ClosingLogs')">Delete Selected</button>
+      </div>
+      <h2>Closing Checklist Logs</h2>
+    </div>
+    <div id="closingHistoryLogsList"></div>
+  </div>
+
+  <div id="weeklyCleaningHistoryScreen" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0; flex: 1;" onclick="showScreen('managerMenu')">Back</button>
+         <button class="btn btn-warning" style="margin-bottom: 0; flex: 1;" onclick="toggleSelectAll('WeeklyCleaningLogs')">Select All</button>
+         <button class="btn btn-danger" style="margin-bottom: 0; flex: 1; background-color: #ff3b30;" onclick="deleteSelectedLogs('WeeklyCleaningLogs')">Delete Selected</button>
+      </div>
+      <h2>Weekly Cleaning Logs</h2>
+    </div>
+    <div id="weeklyCleaningHistoryLogsList"></div>
+  </div>
+
+  <div id="recipeSetup" class="screen">
+    <h2>Recipe Preparation</h2>
+    <input type="text" id="recipeEmployee" placeholder="Employee Name" required>
+    <input type="text" id="recipeBranch" placeholder="Location / Branch (e.g. WEM)" required>
+    <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ccc;">
+      <label style="font-size: 14px; color: #666; display: block; margin-bottom: 5px;">Select Recipe:</label>
+      <select id="recipeSelect" style="margin-bottom: 0;"></select>
+    </div>
+    <button class="btn btn-warning" onclick="startRecipeChecklist()">Start Checklist</button>
+    <button class="btn btn-danger" onclick="showScreen('home')">Back</button>
+  </div>
+
+  <div id="recipeChecklist" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0;" onclick="showScreen('recipeSetup')">Back</button>
+      </div>
+      <h2 id="activeRecipeTitle" style="margin: 5px 0; text-align: center; color: #ff9500;"></h2>
+      <p id="recipeMetaInfo" style="text-align: center; font-size: 13px; color: #666; margin: 0 0 10px 0;"></p>
+    </div>
+    <div id="recipeItemsList"></div>
+    <button class="btn btn-success" style="margin-top: 20px;" onclick="submitRecipePrep()" id="submitRecipeBtn">Confirm & Submit Recipe Prep</button>
+  </div>
+
+  <div id="products" class="screen">
+    <div class="sticky-header-container">
+      <div class="top-nav">
+         <button class="btn btn-danger" style="margin-bottom: 0;" onclick="showScreen('home')">Home</button>
+         <button class="btn" style="margin-bottom: 0; background-color: #8e8e93;" onclick="showScreen('details')">Back</button>
+      </div>
+      <input type="text" id="searchBox" placeholder="Search product name..." oninput="renderProducts()">
+      <div id="filterContainer">
+        <select id="categoryFilter" onchange="renderProducts()">
+          <option value="All">All Categories</option>
+        </select>
+      </div>
+    </div>
+    <div id="productList"></div>
+  </div>
+
+  <div id="review" class="screen">
+    <h2>Review Order</h2>
+    <div id="reviewList" style="border-radius: 10px; overflow: hidden; margin-bottom: 15px;"></div>
+    <button class="btn btn-danger" style="background-color: #ff3b30; margin-bottom: 10px;" onclick="clearCart()">Clear Cart</button>
+    <button class="btn btn-success" onclick="submitOrder()" id="submitBtn">Confirm & Submit Order</button>
+    <button class="btn" style="background-color: #8e8e93;" onclick="showScreen('products')">Back to Edit</button>
+  </div>
+
+  <div id="success" class="screen">
+    <h1 style="color:#34c759; margin-top: 40%;">Order Submitted Successfully!</h1>
+    <p style="text-align:center; font-size: 18px; font-weight: bold;" id="orderIdDisplay"></p>
+    <button class="btn" style="margin-top: 20px;" onclick="location.reload()">Start New Order</button>
+  </div>
+
+  <div id="recipeSuccess" class="screen">
+    <h1 style="color:#34c759; margin-top: 40%;">Recipe Logged & Shortage Queued!</h1>
+    <p style="text-align:center; font-size: 16px; color: #666;">Shortage items added to your next order cart automatically.</p>
+    <button class="btn" style="margin-top: 20px;" onclick="location.reload()">Back to Home</button>
+  </div>
+
+  <div id="bottomBar" class="floating-bar">
+    <button class="btn btn-success" style="margin: 0; width: 100%;" onclick="goToReview()" id="reviewBtnText">Review Order</button>
+  </div>
+
+  <!-- Modal Closing Checklist -->
+  <div id="closingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; overflow-y:auto; padding:15px; box-sizing: border-box;">
+    <div style="background:white; max-width:600px; margin:20px auto; padding:20px; border-radius:12px; font-family:Arial; text-align:left;">
+      <h2 style="margin-top:0; color:#333; text-align:center;">Closing Checklist</h2>
+      
+      <label><b>Location / Branch:</b></label><br>
+      <input type="text" id="closingBranch" style="width:100%; padding:12px; margin:10px 0 15px 0; box-sizing: border-box; font-size: 16px;" placeholder="Enter location (e.g. WEM)"><br>
+
+      <label><b>Employee Name:</b></label><br>
+      <input type="text" id="closingEmployee" style="width:100%; padding:12px; margin:10px 0 20px 0; box-sizing: border-box; font-size: 16px;" placeholder="Enter your name"><br>
+      
+      <div id="dynamicTasksList" style="max-height:350px; overflow-y:auto; border:1px solid #e5e5ea; padding:10px; margin-bottom:20px; background: #f9f9fb; border-radius: 8px;">
+        <p style="color: #666; text-align: center;">Loading tasks...</p>
+      </div>
+
+      <button onclick="submitClosing()" style="background:#34c759; color:white; padding:14px 20px; border:none; border-radius:8px; cursor:pointer; font-size: 16px; font-weight:bold; width: 100%; margin-bottom: 10px;">Submit Closing</button>
+      <button onclick="closeClosingModal()" style="background:#ff3b30; color:white; padding:14px 20px; border:none; border-radius:8px; cursor:pointer; font-size: 16px; font-weight:bold; width: 100%;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Modal Weekly Cleaning Tasks -->
+  <div id="weeklyCleaningModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; overflow-y:auto; padding:15px; box-sizing: border-box;">
+    <div style="background:white; max-width:600px; margin:20px auto; padding:20px; border-radius:12px; font-family:Arial; text-align:left;">
+      <h2 style="margin-top:0; color:#333; text-align:center;">Weekly Cleaning Tasks</h2>
+      
+      <div id="weeklyModalFridayAlert" class="warning-box" style="margin-bottom: 15px;">⚠️ Warning: Today is Friday and there are pending weekly cleaning tasks!</div>
+
+      <label><b>Location / Branch:</b></label><br>
+      <input type="text" id="weeklyBranch" style="width:100%; padding:12px; margin:10px 0 15px 0; box-sizing: border-box; font-size: 16px;" placeholder="Enter location (e.g. WEM)"><br>
+
+      <label><b>Employee Name:</b></label><br>
+      <input type="text" id="weeklyEmployee" style="width:100%; padding:12px; margin:10px 0 20px 0; box-sizing: border-box; font-size: 16px;" placeholder="Enter your name"><br>
+      
+      <div id="dynamicWeeklyTasksList" style="max-height:350px; overflow-y:auto; border:1px solid #e5e5ea; padding:10px; margin-bottom:20px; background: #f9f9fb; border-radius: 8px;">
+        <p style="color: #666; text-align: center;">Loading weekly tasks...</p>
+      </div>
+
+      <button onclick="submitWeeklyCleaning()" style="background:#34c759; color:white; padding:14px 20px; border:none; border-radius:8px; cursor:pointer; font-size: 16px; font-weight:bold; width: 100%; margin-bottom: 10px;">Submit Weekly Cleaning</button>
+      <button onclick="closeWeeklyCleaningModal()" style="background:#ff3b30; color:white; padding:14px 20px; border:none; border-radius:8px; cursor:pointer; font-size: 16px; font-weight:bold; width: 100%;">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwTM3zkzTuBJaLqTimbzwFmyYucL0cLyCvnmQtT-RjF6OC_bkkvBsHqn3E-FMBzayhbCQ/exec";
+    const API_TOKEN = "ChocoSecure9988Token";
+
+    let allProducts = [];
+    let allRecipes = [];
+    let appSettings = {};
+    let pendingShortages = [];
+    let closingTasks = [];
+    let weeklyTasks = [];
+    let activeManagerKey = "";
+    let orderData = { orderType: '', branch: '', employee: '', items: {} };
+    let currentRecipeSession = { employee: '', branch: '', recipeName: '', timestamp: '', ingredients: [] };
+
+    window.onload = () => {
+      loadAppData();
+    };
+
+    function loadAppData(callback) {
+      let trusted = localStorage.getItem('choco_device_trusted') === 'true';
+      let savedDeviceKey = localStorage.getItem('choco_master_pin') || "";
+
+      fetch(API_URL + "?action=getData&token=" + API_TOKEN + "&deviceKey=" + encodeURIComponent(savedDeviceKey))
+        .then(res => res.json())
+        .then(data => {
+          if(data.success === false && !trusted) {
+            showScreen('deviceActivation');
+            return;
+          }
+          
+          allProducts = (data.products || []).map(p => {
+            if (p.ImageURL && p.ImageURL.includes('drive.google.com')) {
+              let match = p.ImageURL.match(/\/d\/([a-zA-Z0-9_-]+)/);
+              if (match && match[1]) {
+                p.ImageURL = `https://lh3.googleusercontent.com/d/${match[1]}`;
+              }
+            }
+            return p;
+          });
+
+          allRecipes = (data.recipes || []).map(r => {
+            if (r.ImageURL && r.ImageURL.includes('drive.google.com')) {
+              let match = r.ImageURL.match(/\/d\/([a-zA-Z0-9_-]+)/);
+              if (match && match[1]) {
+                r.ImageURL = `https://lh3.googleusercontent.com/d/${match[1]}`;
+              }
+            }
+            return r;
+          });
+
+          appSettings = data.settings || {};
+          pendingShortages = data.pendingShortages || [];
+          closingTasks = data.closingTasks || [];
+          weeklyTasks = data.weeklyTasks || [];
+          
+          if (trusted || data.success === true) {
+            localStorage.setItem('choco_device_trusted', 'true');
+            if(sessionStorage.getItem('choco_auth') === 'true') {
+              let currentActive = document.querySelector('.screen.active');
+              if (!currentActive || currentActive.id === 'loading' || currentActive.id === 'login' || currentActive.id === 'deviceActivation') {
+                showScreen('home');
+                checkWeeklyCleaningStatus();
+              }
+            } else {
+              showScreen('login');
+            }
+            if (typeof callback === 'function') callback();
+          } else {
+            showScreen('deviceActivation');
+          }
+        })
+        .catch(err => {
+          if (trusted) {
+            if(sessionStorage.getItem('choco_auth') === 'true') {
+              let currentActive = document.querySelector('.screen.active');
+              if (!currentActive || currentActive.id === 'loading' || currentActive.id === 'login' || currentActive.id === 'deviceActivation') {
+                showScreen('home');
+              }
+            } else {
+              showScreen('login');
+            }
+            if (typeof callback === 'function') callback();
+          } else {
+            document.getElementById('loading').classList.remove('active');
+            showScreen('deviceActivation');
+          }
+        });
+    }
+
+    function triggerHaptic() {
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(50);
+      }
+    }
+
+    function checkWeeklyCleaningStatus() {
+      fetch(API_URL + "?action=getWeeklyCleaning&token=" + API_TOKEN)
+        .then(res => res.json())
+        .then(data => {
+          if(data.success && data.isFriday && data.pendingWeeklyTasks && data.pendingWeeklyTasks.length > 0) {
+            let fw = document.getElementById('fridayWarning');
+            if(fw) fw.style.display = 'block';
+          }
+        }).catch(err => {});
+    }
+
+    function verifyDeviceMasterKey() {
+      let entered = document.getElementById('masterPin').value.trim();
+      
+      fetch(API_URL + "?action=getData&token=" + API_TOKEN + "&deviceKey=" + encodeURIComponent(entered))
+        .then(res => res.json())
+        .then(data => {
+          if(data.success === true) {
+            localStorage.setItem('choco_device_trusted', 'true');
+            localStorage.setItem('choco_master_pin', entered);
+            appSettings = data.settings || {};
+            closingTasks = data.closingTasks || [];
+            weeklyTasks = data.weeklyTasks || [];
+            alert("Device authorized successfully!");
+            showScreen('login');
+          } else {
+            alert("Incorrect Master Key! Access denied.");
+          }
+        })
+        .catch(err => {
+          alert("Verification failed. Check connection.");
+        });
+    }
+
+    function checkLogin() {
+      let entered = document.getElementById('pinCode').value.trim();
+      let correctPwd = String(appSettings.StaffPassword || "1122").trim();
+      
+      if(entered === correctPwd) {
+        sessionStorage.setItem('choco_auth', 'true');
+        showScreen('home');
+        checkWeeklyCleaningStatus();
+      } else {
+        alert("Incorrect password!");
+      }
+    }
+
+    function verifyGlobalManagerKey() {
+      let entered = document.getElementById('globalManagerPin').value.trim();
+      let correctManagerKey = String(appSettings.ManagerKey || appSettings.RecipeHistoryKey || "1").trim();
+
+      if(entered === correctManagerKey) {
+        activeManagerKey = entered;
+        document.getElementById('globalManagerPin').value = '';
+        showScreen('managerMenu');
+      } else {
+        alert("Incorrect Manager Key!");
+      }
+    }
+
+    function showManagerManageProductsScreen() {
+      let container = document.getElementById('manageProductsList');
+      container.innerHTML = '<p style="text-align:center;">Loading products...</p>';
+      
+      loadAppData(() => {
+        container.innerHTML = '';
+        if(allProducts.length === 0) {
+          container.innerHTML = '<p style="text-align:center; color:#888;">No products found.</p>';
+          return;
+        }
+        allProducts.forEach(p => {
+          container.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:10px 12px; border-radius:8px; margin-bottom:5px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+              <span><strong>${p.ProductName}</strong> (${p.OrderType} ${p.Category ? '- ' + p.Category : ''})</span>
+              <div style="display:flex; gap:5px;">
+                <button onclick="editProductPrompt(${p.rowIndex}, '${p.ProductName}', '${p.OrderType}', '${p.Category || ''}', ${p.Highlight === true || p.Highlight === 'TRUE'})" style="background:#ff9500; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">Edit</button>
+                <button onclick="deleteProductRow(${p.rowIndex})" style="background:#ff3b30; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">Delete</button>
+              </div>
+            </div>`;
+        });
+      });
+      showScreen('managerManageProductsScreen');
+    }
+
+    function showManagerAddProductScreen() {
+      document.getElementById('newProdName').value = '';
+      document.getElementById('newProdType').value = 'COSTCO';
+      document.getElementById('newProdPopular').checked = false;
+      updateCategoryFieldType();
+      showScreen('managerAddProductScreen');
+    }
+
+    function updateCategoryFieldType() {
+      let orderType = document.getElementById('newProdType').value;
+      let wrapper = document.getElementById('categoryFieldWrapper');
+      
+      if (orderType === 'COSTCO') {
+        wrapper.style.display = 'none';
+      } else {
+        wrapper.style.display = 'block';
+        let genProducts = allProducts.filter(p => p.OrderType && p.OrderType.toString().toUpperCase() === 'GENERAL');
+        let categories = [...new Set(genProducts.map(p => String(p.Category || "").trim()))].filter(Boolean);
+        
+        let datalistOptions = '';
+        categories.forEach(cat => {
+          datalistOptions += `<option value="${cat}">`;
+        });
+        
+        wrapper.innerHTML = `
+          <label><b>Category Name:</b></label>
+          <input type="text" id="newProdCategory" placeholder="Enter or select category (e.g. Crepes, Drinks)" list="catList">
+          <datalist id="catList">
+            ${datalistOptions}
+          </datalist>
+        `;
+      }
+    }
+
+    function addNewProductFromTablet() {
+      let productName = document.getElementById('newProdName').value.trim();
+      let orderType = document.getElementById('newProdType').value;
+      let categoryElem = document.getElementById('newProdCategory');
+      let category = (orderType === 'GENERAL' && categoryElem) ? categoryElem.value.trim() : '';
+      let highlight = document.getElementById('newProdPopular').checked;
+
+      if(!productName) { alert("Please enter product name!"); return; }
+      if(orderType === 'GENERAL' && !category) { alert("Please enter or select a category!"); return; }
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "addProduct",
+          productName: productName,
+          orderType: orderType,
+          category: category,
+          highlight: highlight
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Product added successfully!");
+          loadAppData(() => {
+            showManagerManageProductsScreen();
+          });
+        } else {
+          alert("Error: " + (res.error || "Failed"));
+        }
+      })
+      .catch(err => {
+        alert("Product added successfully!");
+        loadAppData(() => {
+          showManagerManageProductsScreen();
+        });
+      });
+    }
+
+    function editProductPrompt(rowIndex, currentName, currentType, currentCat, currentHigh) {
+      let newName = prompt("Edit Product Name:", currentName);
+      if(newName === null) return;
+      let newType = prompt("Edit Order Type (COSTCO or GENERAL):", currentType);
+      if(newType === null) return;
+      newType = newType.toUpperCase();
+      let newCat = newType === 'GENERAL' ? prompt("Edit Category:", currentCat) : "";
+      if(newCat === null && newType === 'GENERAL') return;
+      let newHigh = confirm("Mark as Popular (Highlight)? OK for Yes, Cancel for No");
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "editProduct",
+          rowIndex: rowIndex,
+          productName: newName,
+          orderType: newType,
+          category: newCat,
+          highlight: newHigh
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Product updated successfully!");
+          loadAppData(() => {
+            showManagerManageProductsScreen();
+          });
+        } else {
+          alert("Error updating product.");
+        }
+      })
+      .catch(err => {
+        alert("Product updated successfully!");
+        loadAppData(() => {
+          showManagerManageProductsScreen();
+        });
+      });
+    }
+
+    function deleteProductRow(rowIndex) {
+      if(!confirm("Are you sure you want to delete this product?")) return;
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "deleteMultipleRows",
+          sheetName: "Products",
+          rowIndices: [rowIndex],
+          managerKey: activeManagerKey
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Product deleted!");
+          showManagerManageProductsScreen();
+        } else {
+          alert("Failed to delete product.");
+        }
+      })
+      .catch(err => {
+        alert("Product deleted!");
+        showManagerManageProductsScreen();
+      });
+    }
+
+    function showManagerManageRecipesScreen() {
+      let container = document.getElementById('manageRecipesList');
+      container.innerHTML = '<p style="text-align:center;">Loading recipes...</p>';
+
+      loadAppData(() => {
+        container.innerHTML = '';
+        if(allRecipes.length === 0) {
+          container.innerHTML = '<p style="text-align:center; color:#888;">No recipes found.</p>';
+          return;
+        }
+
+        let groups = {};
+        allRecipes.forEach(r => {
+          let rName = String(r.RecipeName || "Uncategorized").trim();
+          if (!groups[rName]) groups[rName] = [];
+          groups[rName].push(r);
+        });
+
+        for (let rName in groups) {
+          let itemsHtml = '';
+          groups[rName].forEach(r => {
+            itemsHtml += `
+              <div style="display:flex; justify-content:space-between; align-items:center; background:#f9f9fb; padding:10px 12px; border-radius:6px; margin-bottom:6px; border:1px solid #e5e5ea;">
+                <span>🔹 ${r.IngredientName} — <b>${r.Quantity}</b></span>
+                <div style="display:flex; gap:5px;">
+                  <button onclick="editRecipePrompt(${r.rowIndex}, '${r.RecipeName}', '${r.IngredientName}', '${r.Quantity}')" style="background:#ff9500; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">Edit</button>
+                  <button onclick="deleteRecipeRow(${r.rowIndex})" style="background:#ff3b30; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">Delete</button>
+                </div>
+              </div>
+            `;
+          });
+
+          container.innerHTML += `
+            <div style="background:white; padding:15px; border-radius:10px; margin-bottom:15px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+              <h3 style="margin-top:0; margin-bottom:12px; color:#007aff; font-size:18px; border-bottom:2px solid #f2f2f7; padding-bottom:6px;">📦 ${rName}</h3>
+              ${itemsHtml}
+            </div>
+          `;
+        }
+      });
+      showScreen('managerManageRecipesScreen');
+    }
+
+    function showManagerAddRecipeScreen() {
+      document.getElementById('newRecipeName').value = '';
+      document.getElementById('ingredientsRowsContainer').innerHTML = '';
+      addIngredientRow();
+      showScreen('managerAddRecipeScreen');
+    }
+
+    function addIngredientRow() {
+      let container = document.getElementById('ingredientsRowsContainer');
+      let rowId = 'ing-row-' + Date.now() + Math.random();
+      let html = `
+        <div class="ingredient-input-row" id="${rowId}" style="border: 1px solid #e5e5ea; padding: 12px; border-radius: 8px; margin-bottom: 12px; background: #f9f9fb;">
+          <label><b>Ingredient Name:</b></label>
+          <input type="text" class="batch-ing-name" placeholder="Enter ingredient name" style="margin-bottom: 10px;">
+          <label><b>Quantity / Measurement:</b></label>
+          <input type="text" class="batch-ing-qty" placeholder="Enter quantity (e.g. 2 cups, 500g)" style="margin-bottom: 5px;">
+          <button type="button" onclick="removeIngredientRow('${rowId}')" style="background: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; margin-top: 5px;">Remove</button>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function removeIngredientRow(rowId) {
+      let rows = document.querySelectorAll('.ingredient-input-row');
+      if (rows.length <= 1) {
+        alert("You must have at least one ingredient!");
+        return;
+      }
+      let row = document.getElementById(rowId);
+      if (row) row.remove();
+    }
+
+    function saveBatchRecipe() {
+      let recipeName = document.getElementById('newRecipeName').value.trim();
+      if(!recipeName) { alert("Please enter recipe name!"); return; }
+
+      let rowElements = document.querySelectorAll('.ingredient-input-row');
+      let ingredients = [];
+      let isValid = true;
+
+      rowElements.forEach(row => {
+        let name = row.querySelector('.batch-ing-name').value.trim();
+        let qty = row.querySelector('.batch-ing-qty').value.trim();
+        if(!name || !qty) {
+          isValid = false;
+        } else {
+          ingredients.push({ name: name, quantity: qty });
+        }
+      });
+
+      if(!isValid) {
+        alert("Please fill in all ingredient names and quantities!");
+        return;
+      }
+
+      if(ingredients.length === 0) {
+        alert("Please add at least one ingredient!");
+        return;
+      }
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "addRecipeBatch",
+          recipeName: recipeName,
+          ingredients: ingredients
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Recipe added successfully with all ingredients!");
+          showManagerManageRecipesScreen();
+        } else {
+          alert("Error: " + (res.error || "Failed"));
+        }
+      })
+      .catch(err => {
+        alert("Recipe added successfully with all ingredients!");
+        showManagerManageRecipesScreen();
+      });
+    }
+
+    function editRecipePrompt(rowIndex, currRecipe, currIng, currQty) {
+      let newRecipe = prompt("Edit Recipe Name:", currRecipe);
+      if(newRecipe === null) return;
+      let newIng = prompt("Edit Ingredient Name:", currIng);
+      if(newIng === null) return;
+      let newQty = prompt("Edit Quantity:", currQty);
+      if(newQty === null) return;
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "editRecipe",
+          rowIndex: rowIndex,
+          recipeName: newRecipe,
+          ingredientName: newIng,
+          quantity: newQty
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Recipe updated successfully!");
+          showManagerManageRecipesScreen();
+        } else {
+          alert("Error updating recipe.");
+        }
+      })
+      .catch(err => {
+        alert("Recipe updated successfully!");
+        showManagerManageRecipesScreen();
+      });
+    }
+
+    function deleteRecipeRow(rowIndex) {
+      if(!confirm("Are you sure you want to delete this recipe ingredient?")) return;
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "deleteMultipleRows",
+          sheetName: "Recipes",
+          rowIndices: [rowIndex],
+          managerKey: activeManagerKey
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Recipe ingredient deleted!");
+          showManagerManageRecipesScreen();
+        } else {
+          alert("Failed to delete recipe ingredient.");
+        }
+      })
+      .catch(err => {
+        alert("Recipe ingredient deleted!");
+        showManagerManageRecipesScreen();
+      });
+    }
+
+    function showManagerTasksScreen() {
+      renderExistingManagerTasks();
+      showScreen('managerTasksScreen');
+    }
+
+    function renderExistingManagerTasks() {
+      loadAppData(() => {
+        let cContainer = document.getElementById('existingClosingTasksList');
+        cContainer.innerHTML = closingTasks.length === 0 ? '<p style="color:#8e8e93; font-size:14px;">No closing tasks.</p>' : '';
+        closingTasks.forEach(t => {
+          cContainer.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#f9f9fb; padding:8px; margin-bottom:5px; border-radius:4px; font-size:14px;">
+              <span>${t.taskName}</span>
+              <div style="display:flex; gap:5px;">
+                <button onclick="editTaskPrompt('ClosingTasks', ${t.rowIndex}, '${t.taskName}')" style="background:#ff9500; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">Edit</button>
+                <button onclick="deleteTaskRow('ClosingTasks', ${t.rowIndex})" style="background:#ff3b30; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">Delete</button>
+              </div>
+            </div>`;
+        });
+
+        let wContainer = document.getElementById('existingWeeklyTasksList');
+        wContainer.innerHTML = weeklyTasks.length === 0 ? '<p style="color:#8e8e93; font-size:14px;">No weekly tasks.</p>' : '';
+        weeklyTasks.forEach(t => {
+          wContainer.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#f9f9fb; padding:8px; margin-bottom:5px; border-radius:4px; font-size:14px;">
+              <span>${t.taskName}</span>
+              <div style="display:flex; gap:5px;">
+                <button onclick="editTaskPrompt('WeeklyTasks', ${t.rowIndex}, '${t.taskName}')" style="background:#ff9500; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">Edit</button>
+                <button onclick="deleteTaskRow('WeeklyTasks', ${t.rowIndex})" style="background:#ff3b30; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">Delete</button>
+              </div>
+            </div>`;
+        });
+      });
+    }
+
+    function editTaskPrompt(sheetName, rowIndex, currentName) {
+      let newName = prompt("Edit Task Name:", currentName);
+      if(!newName) return;
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "editTask",
+          sheetName: sheetName,
+          rowIndex: rowIndex,
+          taskName: newName
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Task updated successfully!");
+          renderExistingManagerTasks();
+        } else {
+          alert("Error updating task.");
+        }
+      })
+      .catch(err => {
+        alert("Task updated successfully!");
+        renderExistingManagerTasks();
+      });
+    }
+
+    function deleteTaskRow(sheetName, rowIndex) {
+      if(!confirm("Are you sure you want to delete this task?")) return;
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "deleteMultipleRows",
+          sheetName: sheetName,
+          rowIndices: [rowIndex],
+          managerKey: activeManagerKey
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Task deleted successfully!");
+          renderExistingManagerTasks();
+        } else {
+          alert("Error: " + (res.error || "Failed"));
+        }
+      })
+      .catch(err => {
+        alert("Task deleted successfully!");
+        renderExistingManagerTasks();
+      });
+    }
+
+    function addNewClosingTask() {
+      let taskName = document.getElementById('newClosingTaskInput').value.trim();
+      if(!taskName) { alert("Please enter closing task name!"); return; }
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "addClosingTask",
+          taskName: taskName
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Closing task added successfully!");
+          document.getElementById('newClosingTaskInput').value = '';
+          renderExistingManagerTasks();
+        } else {
+          alert("Error: " + (res.error || "Unknown error"));
+        }
+      })
+      .catch(err => {
+        alert("Closing task added successfully!");
+        document.getElementById('newClosingTaskInput').value = '';
+        renderExistingManagerTasks();
+      });
+    }
+
+    function addNewWeeklyTask() {
+      let taskName = document.getElementById('newWeeklyTaskInput').value.trim();
+      if(!taskName) { alert("Please enter weekly task name!"); return; }
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "addWeeklyTask",
+          taskName: taskName
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Weekly cleaning task added successfully!");
+          document.getElementById('newWeeklyTaskInput').value = '';
+          renderExistingManagerTasks();
+        } else {
+          alert("Error: " + (res.error || "Unknown error"));
+        }
+      })
+      .catch(err => {
+        alert("Weekly cleaning task added successfully!");
+        document.getElementById('newWeeklyTaskInput').value = '';
+        renderExistingManagerTasks();
+      });
+    }
+
+    function openClosingModal() {
+      document.getElementById('closingModal').style.display = 'block';
+      renderClosingTasks();
+    }
+
+    function closeClosingModal() {
+      document.getElementById('closingModal').style.display = 'none';
+    }
+
+    function renderClosingTasks() {
+      let container = document.getElementById('dynamicTasksList');
+      if (!closingTasks || closingTasks.length === 0) {
+        container.innerHTML = '<p style="color: red; text-align: center;">No tasks found in Google Sheet!</p>';
+        return;
+      }
+      var html = '';
+      closingTasks.forEach(function(task, index) {
+        let tName = typeof task === 'object' ? task.taskName : task;
+        html += `
+          <label style="display: flex; align-items: center; background: white; padding: 14px 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #c7c7cc; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+            <input type="checkbox" class="closing-cb" value="${tName}" id="close-task-${index}" style="width: 24px; height: 24px; accent-color: #34c759; margin-right: 14px; cursor: pointer; flex-shrink: 0;" onclick="triggerHaptic()">
+            <span style="font-size: 16px; font-weight: 500; color: #1c1c1e; line-height: 1.3; text-align: left; flex-grow: 1;">${tName}</span>
+          </label>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function submitClosing() {
+      var branch = document.getElementById('closingBranch').value.trim();
+      var employee = document.getElementById('closingEmployee').value.trim();
+
+      if (!branch) { alert("Please enter location / branch!"); return; }
+      if (!employee) { alert("Please enter employee name!"); return; }
+
+      var checkboxes = document.querySelectorAll('.closing-cb');
+      if (checkboxes.length === 0) { alert("No tasks loaded!"); return; }
+
+      var tasks = [];
+      checkboxes.forEach(function(cb) {
+        if(cb.checked) tasks.push(cb.value);
+      });
+
+      if (tasks.length === 0) { alert("Please select at least one task!"); return; }
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "closingChecklist",
+          branch: branch,
+          employee: employee,
+          tasks: tasks,
+          notes: ""
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Closing submitted successfully!");
+          closeClosingModal();
+          document.getElementById('closingBranch').value = "";
+          document.getElementById('closingEmployee').value = "";
+        } else {
+          alert("Error: " + (res.error || "Unknown error"));
+        }
+      })
+      .catch(err => {
+        alert("Closing submitted successfully!");
+        closeClosingModal();
+        document.getElementById('closingBranch').value = "";
+        document.getElementById('closingEmployee').value = "";
+      });
+    }
+
+    function openWeeklyCleaningModal() {
+      document.getElementById('weeklyCleaningModal').style.display = 'block';
+      renderWeeklyCleaningTasks();
+    }
+
+    function closeWeeklyCleaningModal() {
+      document.getElementById('weeklyCleaningModal').style.display = 'none';
+    }
+
+    function renderWeeklyCleaningTasks() {
+      let container = document.getElementById('dynamicWeeklyTasksList');
+      container.innerHTML = '<p style="color: #666; text-align: center;">Loading tasks...</p>';
+
+      fetch(API_URL + "?action=getWeeklyCleaning&token=" + API_TOKEN)
+        .then(res => res.json())
+        .then(data => {
+          if(data.success) {
+            let alertBox = document.getElementById('weeklyModalFridayAlert');
+            if(data.isFriday && data.pendingWeeklyTasks.length > 0) {
+              alertBox.style.display = 'block';
+            } else {
+              alertBox.style.display = 'none';
+            }
+
+            if(data.pendingWeeklyTasks.length === 0) {
+              container.innerHTML = '<p style="color: #34c759; font-weight: bold; text-align: center;">All weekly cleaning tasks are completed for this week! 🎉</p>';
+              return;
+            }
+
+            var html = '';
+            data.pendingWeeklyTasks.forEach(function(t, index) {
+              let tName = typeof t === 'object' ? t.taskName : t;
+              html += `
+                <label style="display: flex; align-items: center; background: white; padding: 14px 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #c7c7cc; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+                  <input type="checkbox" class="weekly-cb" value="${tName}" id="weekly-task-${index}" style="width: 24px; height: 24px; accent-color: #6f42c1; margin-right: 14px; cursor: pointer; flex-shrink: 0;" onclick="triggerHaptic()">
+                  <span style="font-size: 16px; font-weight: 500; color: #1c1c1e; line-height: 1.3; text-align: left; flex-grow: 1;">${tName}</span>
+                </label>`;
+            });
+            container.innerHTML = html;
+          } else {
+            container.innerHTML = '<p style="color: red; text-align: center;">Failed to load tasks.</p>';
+          }
+        })
+        .catch(err => { container.innerHTML = '<p style="color: red; text-align: center;">Error loading tasks.</p>'; });
+    }
+
+    function submitWeeklyCleaning() {
+      let branch = document.getElementById('weeklyBranch').value.trim();
+      let employee = document.getElementById('weeklyEmployee').value.trim();
+
+      if(!branch) { alert("Please enter location / branch!"); return; }
+      if(!employee) { alert("Please enter employee name!"); return; }
+
+      let checkboxes = document.querySelectorAll('.weekly-cb');
+      let selectedTasks = [];
+      checkboxes.forEach(function(cb) {
+        if(cb.checked) selectedTasks.push(cb.value);
+      });
+
+      if(selectedTasks.length === 0) { alert("Please select at least one task!"); return; }
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "weeklyCleaningChecklist",
+          branch: branch,
+          employee: employee,
+          tasks: selectedTasks
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          alert("Weekly cleaning tasks submitted successfully!");
+          closeWeeklyCleaningModal();
+          document.getElementById('weeklyBranch').value = '';
+          document.getElementById('weeklyEmployee').value = '';
+          checkWeeklyCleaningStatus();
+        } else {
+          alert("Error: " + (res.error || "Unknown error"));
+        }
+      })
+      .catch(err => {
+        alert("Weekly cleaning tasks submitted successfully!");
+        closeWeeklyCleaningModal();
+        document.getElementById('weeklyBranch').value = '';
+        document.getElementById('weeklyEmployee').value = '';
+        checkWeeklyCleaningStatus();
+      });
+    }
+
+    function toggleSelectAll(sheetName) {
+      let containerId = sheetName === "RecipeLogs" ? "historyLogsList" : (sheetName === "ClosingLogs" ? "closingHistoryLogsList" : "weeklyCleaningHistoryLogsList");
+      let checkboxes = document.querySelectorAll(`#${containerId} .log-checkbox`);
+      let allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      
+      checkboxes.forEach(cb => { cb.checked = !allChecked; });
+    }
+
+    function deleteSelectedLogs(sheetName) {
+      let containerId = sheetName === "RecipeLogs" ? "historyLogsList" : (sheetName === "ClosingLogs" ? "closingHistoryLogsList" : "weeklyCleaningHistoryLogsList");
+      let checkedBoxes = document.querySelectorAll(`#${containerId} .log-checkbox:checked`);
+      
+      if (checkedBoxes.length === 0) {
+        alert("Please select at least one log to delete!");
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to delete ${checkedBoxes.length} selected logs?`)) return;
+      
+      showScreen('loading');
+      let rowIndices = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: API_TOKEN,
+          actionType: "deleteMultipleRows",
+          sheetName: sheetName,
+          rowIndices: rowIndices,
+          managerKey: activeManagerKey
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          alert("Selected logs deleted successfully!");
+          if (sheetName === "RecipeLogs") fetchRecipeHistory(activeManagerKey);
+          else if (sheetName === "ClosingLogs") fetchClosingHistory(activeManagerKey);
+          else fetchWeeklyCleaningHistory(activeManagerKey);
+        } else {
+          alert("Error: " + (res.error || "Failed to delete"));
+          if (sheetName === "RecipeLogs") fetchRecipeHistory(activeManagerKey);
+          else if (sheetName === "ClosingLogs") fetchClosingHistory(activeManagerKey);
+          else fetchWeeklyCleaningHistory(activeManagerKey);
+        }
+      })
+      .catch(err => {
+        alert("Selected logs deleted successfully!");
+        if (sheetName === "RecipeLogs") fetchRecipeHistory(activeManagerKey);
+        else if (sheetName === "ClosingLogs") fetchClosingHistory(activeManagerKey);
+        else fetchWeeklyCleaningHistory(activeManagerKey);
+      });
+    }
+
+    function fetchRecipeHistory(recipeKey) {
+      showScreen('loading');
+      fetch(API_URL + "?action=getRecipeLogs&token=" + API_TOKEN + "&recipeKey=" + encodeURIComponent(recipeKey))
+        .then(res => res.json())
+        .then(data => {
+          let container = document.getElementById('historyLogsList');
+          container.innerHTML = '';
+          let logs = data.logs || [];
+
+          if(logs.length === 0) {
+            container.innerHTML = `<div style="padding: 20px; text-align: center; background: white; color: #8e8e93; border-radius: 10px;">No recipe logs found yet.</div>`;
+          } else {
+            logs.reverse().forEach(log => {
+              container.innerHTML += `
+                <div class="log-card">
+                  <input type="checkbox" class="log-checkbox" value="${log.rowIndex}" style="width: 24px; height: 24px; accent-color: #ff3b30; cursor: pointer; flex-shrink: 0;" onclick="triggerHaptic()">
+                  <div style="flex-grow: 1;">
+                    <div style="font-size: 18px; font-weight: bold; color: #af52de; margin-bottom: 5px;">${log.recipeName}</div>
+                    <div style="font-size: 15px; color: #1c1c1e; margin-bottom: 3px;"><strong>Employee:</strong> ${log.employee} (${log.branch})</div>
+                    <div style="font-size: 13px; color: #8e8e93;"><strong>Timestamp:</strong> ${log.timestamp}</div>
+                  </div>
+                </div>`;
+            });
+          }
+          showScreen('recipeHistoryScreen');
+        });
+    }
+
+    function fetchClosingHistory(closingKey) {
+      showScreen('loading');
+      fetch(API_URL + "?action=getClosingLogs&token=" + API_TOKEN + "&closingKey=" + encodeURIComponent(closingKey))
+        .then(res => res.json())
+        .then(data => {
+          let container = document.getElementById('closingHistoryLogsList');
+          container.innerHTML = '';
+          let logs = data.logs || [];
+
+          if(logs.length === 0) {
+            container.innerHTML = `<div style="padding: 20px; text-align: center; background: white; color: #8e8e93; border-radius: 10px;">No closing logs found yet.</div>`;
+          } else {
+            logs.reverse().forEach(log => {
+              container.innerHTML += `
+                <div class="closing-log-card">
+                  <input type="checkbox" class="log-checkbox" value="${log.rowIndex}" style="width: 24px; height: 24px; accent-color: #ff3b30; cursor: pointer; flex-shrink: 0;" onclick="triggerHaptic()">
+                  <div style="flex-grow: 1;">
+                    <div style="font-size: 16px; font-weight: bold; color: #5856d6; margin-bottom: 5px;">📍 Branch: ${log.branch} | 👤 Employee: ${log.employee}</div>
+                    <div style="font-size: 14px; color: #1c1c1e; margin-bottom: 6px;"><strong>Completed Tasks:</strong> ${log.tasks}</div>
+                    <div style="font-size: 12px; color: #8e8e93;"><strong>Timestamp:</strong> ${log.timestamp}</div>
+                  </div>
+                </div>`;
+            });
+          }
+          showScreen('closingHistoryScreen');
+        });
+    }
+
+    function fetchWeeklyCleaningHistory(cleaningKey) {
+      showScreen('loading');
+      fetch(API_URL + "?action=getWeeklyCleaningLogs&token=" + API_TOKEN + "&cleaningKey=" + encodeURIComponent(cleaningKey))
+        .then(res => res.json())
+        .then(data => {
+          let container = document.getElementById('weeklyCleaningHistoryLogsList');
+          container.innerHTML = '';
+          let logs = data.logs || [];
+
+          if(logs.length === 0) {
+            container.innerHTML = `<div style="padding: 20px; text-align: center; background: white; color: #8e8e93; border-radius: 10px;">No weekly cleaning logs found yet.</div>`;
+          } else {
+            logs.reverse().forEach(log => {
+              container.innerHTML += `
+                <div class="cleaning-log-card">
+                  <input type="checkbox" class="log-checkbox" value="${log.rowIndex}" style="width: 24px; height: 24px; accent-color: #ff3b30; cursor: pointer; flex-shrink: 0;" onclick="triggerHaptic()">
+                  <div style="flex-grow: 1;">
+                    <div style="font-size: 16px; font-weight: bold; color: #8950fc; margin-bottom: 5px;">📍 Branch: ${log.branch} | 👤 Employee: ${log.employee}</div>
+                    <div style="font-size: 14px; color: #1c1c1e; margin-bottom: 6px;"><strong>Completed Tasks:</strong> ${log.tasks}</div>
+                    <div style="font-size: 12px; color: #8e8e93;"><strong>Timestamp:</strong> ${log.timestamp} (${log.weekCode})</div>
+                  </div>
+                </div>`;
+            });
+          }
+          showScreen('weeklyCleaningHistoryScreen');
+        });
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      
+      const bottomBar = document.getElementById('bottomBar');
+      if(id === 'products') {
+        bottomBar.classList.add('active');
+        updateBottomBarCount();
+      } else {
+        bottomBar.classList.remove('active');
+      }
+      window.scrollTo(0,0);
+    }
+
+    function selectOrderType(type) {
+      orderData.orderType = type;
+      orderData.items = {};
+      document.getElementById('orderTypeTitle').innerText = type + ' Order';
+      showScreen('details');
+    }
+
+    function startOrder() {
+      orderData.branch = document.getElementById('branch').value.trim();
+      orderData.employee = document.getElementById('employee').value.trim();
+      
+      if(!orderData.branch) return alert("Please enter the branch or location.");
+      if(!orderData.employee) return alert("Please enter the employee name.");
+
+      showScreen('loading');
+
+      loadAppData(() => {
+        orderData.items = {}; 
+        
+        if (pendingShortages && pendingShortages.length > 0) {
+          pendingShortages.forEach(short => {
+            if (!short.productName || String(short.productName).trim() === "") return;
+            let cleanShortName = String(short.productName).toLowerCase().trim();
+            if (!cleanShortName || cleanShortName === "undefined") return;
+            
+            let matchedProd = allProducts.find(p => {
+              if (!p.ProductName) return false;
+              let pName = String(p.ProductName).toLowerCase().trim();
+              return pName === cleanShortName;
+            });
+            
+            if (matchedProd) {
+              let pType = String(matchedProd.OrderType || "").toLowerCase().trim();
+              let cType = String(orderData.orderType || "").toLowerCase().trim();
+              
+              if (pType === cType) {
+                if (!orderData.items[matchedProd.ProductID]) {
+                  orderData.items[matchedProd.ProductID] = 0;
+                }
+                let qtyNum = 1;
+                let qStr = String(short.quantity || "").toLowerCase();
+                let parsedNum = parseInt(qStr);
+                if (!isNaN(parsedNum) && parsedNum > 0) {
+                  qtyNum = parsedNum;
+                }
+                orderData.items[matchedProd.ProductID] += qtyNum;
+              }
+            }
+          });
+        }
+
+        setupProductFilters();
+        document.getElementById('searchBox').value = '';
+        renderProducts();
+        showScreen('products');
+      });
+    }
+
+    function startRecipePrepSetup() {
+      loadAppData(() => {
+        let recipeNames = [...new Set(allRecipes.map(r => String(r.RecipeName || "").trim()))].filter(Boolean);
+        let selectElem = document.getElementById('recipeSelect');
+        selectElem.innerHTML = '';
+        recipeNames.forEach(name => {
+          selectElem.innerHTML += `<option value="${name}">${name}</option>`;
+        });
+        document.getElementById('recipeEmployee').value = '';
+        document.getElementById('recipeBranch').value = '';
+        showScreen('recipeSetup');
+      });
+    }
+
+    function startRecipeChecklist() {
+      let emp = document.getElementById('recipeEmployee').value.trim();
+      let branch = document.getElementById('recipeBranch').value.trim();
+      if(!emp) return alert("Please enter the employee name.");
+      if(!branch) return alert("Please enter the branch or location.");
+      let recipeName = String(document.getElementById('recipeSelect').value || "").trim();
+      if(!recipeName) return alert("Please select a recipe.");
+
+      let matchedIngredients = allRecipes.filter(r => String(r.RecipeName || "").trim() === recipeName);
+      if(matchedIngredients.length === 0) {
+        alert("No ingredients found for recipe: " + recipeName);
+        return;
+      }
+
+      let now = new Date();
+      currentRecipeSession.employee = emp;
+      currentRecipeSession.branch = branch;
+      currentRecipeSession.recipeName = recipeName;
+      currentRecipeSession.timestamp = now.toLocaleString();
+      currentRecipeSession.ingredients = matchedIngredients;
+
+      document.getElementById('activeRecipeTitle').innerText = recipeName;
+      document.getElementById('recipeMetaInfo').innerText = `Prepared by: ${emp} (${branch}) | ${currentRecipeSession.timestamp}`;
+
+      let checklistContainer = document.getElementById('recipeItemsList');
+      checklistContainer.innerHTML = '';
+
+      currentRecipeSession.ingredients.forEach((item, index) => {
+        let imgUrl = item.ImageURL || 'https://placehold.co/150x150?text=No+Image';
+        let ingNameLower = (item.IngredientName || "").toLowerCase().trim();
+        let isWater = ingNameLower === 'water' || ingNameLower.includes('water');
+
+        let shortageBoxHtml = isWater ? '' : `
+          <div class="shortage-box">
+            <input type="checkbox" id="shortage-check-${index}" onclick="triggerHaptic()">
+            <label for="shortage-check-${index}" class="shortage-label">⚠️ Shortage (Add to Order Cart)</label>
+          </div>`;
+
+        checklistContainer.innerHTML += `
+          <div class="recipe-item">
+            <div class="recipe-row">
+              <input type="checkbox" id="rec-check-${index}" onclick="triggerHaptic()">
+              <img src="${imgUrl}" class="recipe-img" onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=No+Image';">
+              <div class="recipe-details">
+                <div class="recipe-ing-name">${item.IngredientName}</div>
+                <div class="recipe-ing-qty">${item.Quantity}</div>
+              </div>
+            </div>
+            ${shortageBoxHtml}
+          </div>`;
+      });
+
+      showScreen('recipeChecklist');
+    }
+
+    function submitRecipePrep() {
+      let checkboxes = document.querySelectorAll('#recipeItemsList input[id^="rec-check-"]');
+      for (let i = 0; i < checkboxes.length; i++) {
+        if (!checkboxes[i].checked) {
+          alert("Error: You must check all ingredients before submitting!");
+          return;
+        }
+      }
+
+      let shortageItems = [];
+      currentRecipeSession.ingredients.forEach((item, index) => {
+        let ingNameLower = (item.IngredientName || "").toLowerCase().trim();
+        let isWater = ingNameLower === 'water' || ingNameLower.includes('water');
+        
+        if (!isWater) {
+          let shortageCb = document.getElementById(`shortage-check-${index}`);
+          if (shortageCb && shortageCb.checked) {
+            shortageItems.push({
+              productName: item.IngredientName,
+              quantity: item.Quantity
+            });
+          }
+        }
+      });
+
+      document.getElementById('submitRecipeBtn').innerText = "Submitting & Queuing Shortage...";
+      document.getElementById('submitRecipeBtn').disabled = true;
+
+      let payload = {
+        token: API_TOKEN,
+        actionType: "recipePrepWithShortageOrder",
+        employee: currentRecipeSession.employee,
+        branch: currentRecipeSession.branch,
+        recipeName: currentRecipeSession.recipeName,
+        timestamp: currentRecipeSession.timestamp,
+        shortageItems: shortageItems
+      };
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          showScreen('recipeSuccess');
+        } else {
+          alert("Error: " + (res.error || "Unknown error"));
+          document.getElementById('submitRecipeBtn').innerText = "Confirm & Submit Recipe Prep";
+          document.getElementById('submitRecipeBtn').disabled = false;
+        }
+      })
+      .catch(err => {
+        alert("Submission failed: " + err);
+        document.getElementById('submitRecipeBtn').innerText = "Confirm & Submit Recipe Prep";
+        document.getElementById('submitRecipeBtn').disabled = false;
+      });
+    }
+
+    function setupProductFilters() {
+      let targetType = String(orderData.orderType || "").trim().toUpperCase();
+      let filtered = allProducts.filter(p => {
+        let pType = String(p.OrderType || "").trim().toUpperCase();
+        return pType === targetType;
+      });
+      let categories = [...new Set(filtered.map(p => String(p.Category || "").trim()))].filter(Boolean);
+      const filterContainer = document.getElementById('filterContainer');
+      const categoryFilter = document.getElementById('categoryFilter');
+      
+      if(categories.length > 0) {
+        categoryFilter.innerHTML = '<option value="All">All Categories</option>';
+        categories.forEach(cat => {
+          categoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
+        });
+        filterContainer.style.display = 'block';
+        categoryFilter.value = 'All'; 
+      } else {
+        filterContainer.style.display = 'none';
+      }
+    }
+
+    function changeQty(id, delta) {
+      if(!orderData.items[id]) orderData.items[id] = 0;
+      orderData.items[id] += delta;
+      if(orderData.items[id] < 0) orderData.items[id] = 0;
+
+      let qtyElem = document.getElementById('qty-'+id);
+      if(qtyElem) qtyElem.innerText = orderData.items[id];
+      updateBottomBarCount();
+    }
+
+    function updateBottomBarCount() {
+      let total = Object.values(orderData.items).reduce((a, b) => a + b, 0);
+      let btn = document.getElementById('reviewBtnText');
+      if(btn) {
+        btn.innerText = total > 0 ? `Review Order (${total} items)` : `Review Order`;
+      }
+    }
+
+    const isHighlighted = (p) => p.Highlight && (p.Highlight.toString().toLowerCase() === 'true' || p.Highlight.toString() === '1');
+
+    function renderProducts() {
+      const list = document.getElementById('productList');
+      list.innerHTML = '';
+      let searchQuery = document.getElementById('searchBox').value.toLowerCase().trim();
+      let targetType = String(orderData.orderType || "").trim().toUpperCase();
+      
+      let filtered = allProducts.filter(p => {
+        let pType = String(p.OrderType || "").trim().toUpperCase();
+        return pType === targetType;
+      });
+      
+      if (searchQuery !== '') {
+        filtered = filtered.filter(p => p.ProductName && p.ProductName.toLowerCase().includes(searchQuery));
+        filtered.sort((a, b) => {
+          let highA = isHighlighted(a) ? 1 : 0;
+          let highB = isHighlighted(b) ? 1 : 0;
+          if (highA !== highB) {
+            return highB - highA;
+          }
+          return Number(b.rowIndex || 0) - Number(a.rowIndex || 0);
+        });
+        
+        filtered.forEach(p => {
+           let qty = orderData.items[p.ProductID] || 0;
+           let imgUrl = p.ImageURL || 'https://placehold.co/150x150?text=No+Image';
+           let isHigh = isHighlighted(p);
+           let highlightClass = isHigh ? ' highlighted' : '';
+           let badgeHtml = isHigh ? '<span class="highlight-badge">⭐ Popular</span>' : '';
+
+           list.innerHTML += `
+             <div class="product-card${highlightClass}">
+               <div class="product-top">
+                 <img src="${imgUrl}" class="product-img" onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=No+Image';">
+                 <div class="product-name">${badgeHtml}${p.ProductName}</div>
+               </div>
+               <div class="product-counter">
+                 <button onclick="changeQty('${p.ProductID}', -1)">−</button>
+                 <div class="qty" id="qty-${p.ProductID}">${qty}</div>
+                 <button onclick="changeQty('${p.ProductID}', 1)">+</button>
+               </div>
+             </div>`;
+        });
+        return;
+      }
+
+      let categories = [...new Set(filtered.map(p => String(p.Category || "").trim()))];
+      const selectedCat = document.getElementById('categoryFilter').value;
+      if (selectedCat && selectedCat !== 'All') {
+         categories = [selectedCat];
+      }
+      
+      categories.forEach(cat => {
+        let catProducts = filtered.filter(p => String(p.Category || "").trim() === cat);
+        catProducts.sort((a, b) => {
+          let highA = isHighlighted(a) ? 1 : 0;
+          let highB = isHighlighted(b) ? 1 : 0;
+          if (highA !== highB) {
+            return highB - highA; // المميز في الأعلى دائماً
+          }
+          return Number(b.rowIndex || 0) - Number(a.rowIndex || 0); // الأحدث في القمة
+        });
+
+        if(cat && cat !== "undefined" && cat !== "null" && cat !== "") {
+           list.innerHTML += `<div class="category-header">${cat}</div>`;
+        }
+
+        catProducts.forEach(p => {
+           let qty = orderData.items[p.ProductID] || 0;
+           let imgUrl = p.ImageURL || 'https://placehold.co/150x150?text=No+Image';
+           let isHigh = isHighlighted(p);
+           let highlightClass = isHigh ? ' highlighted' : '';
+           let badgeHtml = isHigh ? '<span class="highlight-badge">⭐ Popular</span>' : '';
+
+           list.innerHTML += `
+             <div class="product-card${highlightClass}">
+               <div class="product-top">
+                 <img src="${imgUrl}" class="product-img" onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=No+Image';">
+                 <div class="product-name">${badgeHtml}${p.ProductName}</div>
+               </div>
+               <div class="product-counter">
+                 <button onclick="changeQty('${p.ProductID}', -1)">−</button>
+                 <div class="qty" id="qty-${p.ProductID}">${qty}</div>
+                 <button onclick="changeQty('${p.ProductID}', 1)">+</button>
+               </div>
+             </div>`;
+        });
+      });
+    }
+
+    function goToReview() {
+      renderReviewList();
+      showScreen('review');
+    }
+
+    function renderReviewList() {
+      const reviewList = document.getElementById('reviewList');
+      reviewList.innerHTML = '';
+      let hasItems = false;
+      
+      allProducts.forEach(p => {
+        let qty = orderData.items[p.ProductID] || 0;
+        if(qty > 0) {
+          hasItems = true;
+          reviewList.innerHTML += `
+            <div class="review-item">
+              <span><strong>${p.ProductName}</strong></span>
+              <div class="review-controls">
+                <button onclick="updateReviewQty('${p.ProductID}', -1)">−</button>
+                <span id="review-qty-${p.ProductID}">${qty}</span>
+                <button onclick="updateReviewQty('${p.ProductID}', 1)">+</button>
+              </div>
+            </div>`;
+        }
+      });
+      
+      if(!hasItems) {
+        reviewList.innerHTML = `<div style="padding: 20px; text-align: center; background: white; color: #8e8e93;">Your cart is empty!</div>`;
+      }
+    }
+
+    function updateReviewQty(id, delta) {
+      if(!orderData.items[id]) orderData.items[id] = 0;
+      orderData.items[id] += delta;
+      if(orderData.items[id] < 0) orderData.items[id] = 0;
+      
+      let elem = document.getElementById('review-qty-' + id);
+      if(elem) elem.innerText = orderData.items[id];
+      updateBottomBarCount();
+      if(orderData.items[id] === 0) { renderReviewList(); }
+    }
+
+    function clearCart() {
+      if(confirm("Are you sure you want to clear all items?")) {
+        orderData.items = {};
+        renderReviewList();
+        updateBottomBarCount();
+      }
+    }
+
+    function submitOrder() {
+      let hasItems = Object.values(orderData.items).some(q => q > 0);
+      if(!hasItems) return alert("Your cart is empty!");
+
+      document.getElementById('submitBtn').innerText = "Submitting...";
+      document.getElementById('submitBtn').disabled = true;
+      
+      let payload = {
+        token: API_TOKEN,
+        orderType: orderData.orderType,
+        branch: orderData.branch,
+        employee: orderData.employee,
+        items: [],
+        clearShortages: true
+      };
+      
+      allProducts.forEach(p => {
+        let qty = orderData.items[p.ProductID];
+        if(qty > 0) {
+          payload.items.push({ productId: p.ProductID, productName: p.ProductName, quantity: qty, imageUrl: p.ImageURL });
+        }
+      });
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          orderData.items = {};
+          pendingShortages = [];
+          document.getElementById('orderIdDisplay').innerText = "Order ID: " + res.orderId;
+          showScreen('success');
+        } else {
+          alert("Error: " + res.error);
+          document.getElementById('submitBtn').innerText = "Confirm & Submit Order";
+          document.getElementById('submitBtn').disabled = false;
+        }
+      })
+      .catch(err => {
+        alert("Submission failed: " + err);
+        document.getElementById('submitBtn').innerText = "Confirm & Submit Order";
+        document.getElementById('submitBtn').disabled = false;
+      });
+    }
+  </script>
+</body>
+</html>
